@@ -8,7 +8,7 @@ rdf <- read.csv('./results/results_all_long.csv')
 rdf$N_EST <- as.factor(rdf$N_EST)
 rdf$Index <- as.factor(rdf$Index)
 rdf$FI <- as.factor(rdf$FI)
-rdf$MR <- factor(rdf$MR, levels = c(5,40,100), labels = c("MR=5", "MR=40", "MR="))
+rdf$MR <- factor(rdf$MR, levels = c(5,40,100), labels = c("MR=5", "MR=40", "MR=100"))
 
 MR = unique(rdf$MR)
 pd = position_dodge(0.6)
@@ -39,12 +39,12 @@ for (i in seq_along(MR)) {
     scale_color_brewer(palette = 'Set1') +
     facet_wrap(MR~., ncol = 1, scales = "free_y") +
     theme(legend.position = "right",
-      axis.text.x = element_text(angle = 45, hjust = 1),
-    )
+      axis.text.x = element_text(angle = 45, hjust = 1))+
+    xlab(NULL) + ylab('AUPRC')
     
   plot(p)
-  filename <- paste0("results/", mr , "_AUPRC" , ".png")
-  # ggsave(filename, plot = p)
+  filename <- paste0("results/", mr , "_AUPRC" , "v2.png")
+  ggsave(filename, plot = p)
 }
 ```
 
@@ -67,12 +67,12 @@ for (i in seq_along(MR)) {
     scale_color_brewer(palette = 'Set1') +
     facet_wrap(MR~., ncol = 1, scales = "free_y") +
     theme(legend.position = "right",
-      axis.text.x = element_text(angle = 45, hjust = 1),
-    )
+      axis.text.x = element_text(angle = 45, hjust = 1))+
+    xlab(NULL) + ylab('AUPRC')
     
   plot(p)
-  filename <- paste0("results/", mr , "_MEAN_AUPRC" , ".png")
-  # ggsave(filename, plot = p)
+  filename <- paste0("results/", mr , "_MEAN_AUPRC" , "v2.png")
+  ggsave(filename, plot = p)
 }
 ```
 
@@ -94,12 +94,12 @@ for (i in seq_along(MR)) {
     scale_color_brewer(palette = 'Set1') +
     facet_wrap(MR~., ncol = 1, scales = "free_y") +
     theme(legend.position = "right",
-      axis.text.x = element_text(angle = 45, hjust = 1),
-    )
+      axis.text.x = element_text(angle = 45, hjust = 1))+
+    xlab(NULL) + ylab('AUROC')
     
   plot(p)
-  filename <- paste0("results/", mr , "_AUROC" , ".png")
-  # ggsave(filename, plot = p)
+  filename <- paste0("results/", mr , "_AUROC" , "v2.png")
+  ggsave(filename, plot = p)
 }
 ```
 
@@ -117,7 +117,7 @@ for (i in seq_along(MR)) {
     geom_errorbar(aes(ymin=MEAN_AUROC-STD_AUROC, ymax=MEAN_AUROC+STD_AUROC), 
                   width=0.4, size = 0.5, position=pd, alpha = 1) +
     geom_point(aes(shape = N_EST), position = pd, size = 3) +
-    # geom_point(aes(y = AUROC),  size = 2)+
+    # geom_point(aes(y = AUROC),position = pd,  size = 2)+
     geom_hline(yintercept = baseline_value, linetype = "dashed", color = "black", alpha = 0.5) + 
         geom_hline(yintercept = MEAN_AUROC.g[i], linetype = "dashed", color = "green", alpha = 0.5) + 
     scale_shape_manual(values=c(3,4,8))+
@@ -129,8 +129,8 @@ for (i in seq_along(MR)) {
     xlab(NULL) + ylab('AUROC')
     
   plot(p)
-  filename <- paste0("results/", mr , "_MEAN_AUROC" , ".png")
-  # ggsave(filename, plot = p)
+  filename <- paste0("results/", mr , "_MEAN_AUROC" , "v2.png")
+  ggsave(filename, plot = p)
 }
 ```
 
