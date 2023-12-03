@@ -1,84 +1,81 @@
----
-title: "R Notebook"
-output: html_notebook
----
-
 ```{r}
-# First thing first! Let's import the libraries that we will use
 library(rstatix)  # pipe-friendly statistical methods
-library(tidyr)   # data manipulation
-library(Rmisc)  # summaries
-library(dplyr)
-library("readxl")
-library(ggsci)
-library(psych)
-library(pracma)
-# library("qdap")
 library(ggplot2)
 library(ggpubr)
-# library(lmerTest)
-require(flexplot)
-library(stringr)  #manipulating strings
-library(MuMIn)  # R^2 estimates for lmer
-library(SimplyAgree)  #repeated measures analysis
-library(viridis)  # Nice color palette
-```
 
-Read long format
-```{r}
 rdf <- read.csv('./results/results_all_long.csv')
 
 rdf$N_EST <- as.factor(rdf$N_EST)
 rdf$Index <- as.factor(rdf$Index)
 rdf$FI <- as.factor(rdf$FI)
 rdf$MR <- as.factor(rdf$MR)
-```
-
-Plot All
-
-```{r fig.width=6}
-
-pd = position_dodge(0.5)
-rdf %>%
-  # filter(Index == 'Adaboost') %>%
-  # filter(FI == 'VR') %>%
-   filter(!is.na(MEAN_AUPRC)) %>%
-  ggplot(aes(x=Index, y=MEAN_AUPRC, group = N_EST, colour = FI)) + 
-  geom_errorbar(aes(ymin=MEAN_AUPRC-STD_AUPRC, ymax=MEAN_AUPRC+STD_AUPRC), 
-                width=0.2, size = 0.5, position=pd, alpha = 1) +
-  # geom_segment( aes(x=Index, xend=Index, y=0, yend=MEAN_AUPRC, group = N_EST, colour = N_EST)) +
-  # geom_col(position = pd, width = 0.1) + 
-  geom_point(shape = 3, position = pd, size = 4) +
-  # scale_shape_manual(values=c(1, 3))+
-  theme_pubr() + 
-  scale_color_brewer(palette = 'Set1') +
-  facet_wrap(MR~., ncol = 1, scales = "free_y") +
-  theme(legend.position = "right",
-    axis.text.x = element_text(angle = 45, hjust = 1),
-  )
-  
-  
-  
 
 ```
-Plot conditions separately
 ```{r fig.width=4}
 
 MR = unique(rdf$MR)
 pd = position_dodge(0.6)
 
-for (mr in MR) {
+AUROC <- c(0.6619815875877165, 0.8290163353003178, 0.9078733931801096)
+AUPRC <- c(0.10999212039806713, 0.4261383315393321, 0.6587304621389592)
+MEAN_AUPRC <- c(0.19955715263807533, 0.5260921589703365, 0.7257882565622619)
+MEAN_AUROC <- c(0.6725450267402954, 0.8441343415588369, 0.916339278444858)
+
+for (i in seq_along(MR)) {
+  mr <- MR[i]
+  baseline_value <- AUPRC[i]
   p <- rdf %>%
-    # filter(Index == 'Adaboost') %>%
-    # filter(FI == 'VR') %>%
+    filter(MR == mr) %>%
+     filter(!is.na(AUPRC)) %>%
+    ggplot(aes(x=Index, y=AUPRC, group = N_EST, colour = FI)) + 
+    geom_point(aes(shape = N_EST), position = pd, size = 3) +
+    geom_hline(yintercept = baseline_value, linetype = "dashed", color = "black") + 
+    scale_shape_manual(values=c(3,4,8))+
+    theme_pubr() + 
+    scale_color_brewer(palette = 'Set1') +
+    facet_wrap(MR~., ncol = 1, scales = "free_y") +
+    theme(legend.position = "right",
+      axis.text.x = element_text(angle = 45, hjust = 1),
+    )
+    
+  plot(p)
+  filename <- paste0("results/", mr , "_AUPRC" , ".png")
+  ggsave(filename, plot = p)
+}
+
+for (i in seq_along(MR)) {
+  mr <- MR[i]
+  baseline_value <- AUROC[i]
+  p <- rdf %>%
+    filter(MR == mr) %>%
+     filter(!is.na(AUROC)) %>%
+    ggplot(aes(x=Index, y=AUROC, group = N_EST, colour = FI)) + 
+    geom_point(aes(shape = N_EST), position = pd, size = 3) +
+    geom_hline(yintercept = baseline_value, linetype = "dashed", color = "black") + 
+    scale_shape_manual(values=c(3,4,8))+
+    theme_pubr() + 
+    scale_color_brewer(palette = 'Set1') +
+    facet_wrap(MR~., ncol = 1, scales = "free_y") +
+    theme(legend.position = "right",
+      axis.text.x = element_text(angle = 45, hjust = 1),
+    )
+    
+  plot(p)
+  filename <- paste0("results/", mr , "_AUROC" , ".png")
+  ggsave(filename, plot = p)
+}
+
+for (i in seq_along(MR)) {
+  mr <- MR[i]
+  baseline_value <- MEAN_AUPRC[i]
+  p <- rdf %>%
     filter(MR == mr) %>%
      filter(!is.na(MEAN_AUPRC)) %>%
     ggplot(aes(x=Index, y=MEAN_AUPRC, group = N_EST, colour = FI)) + 
     geom_errorbar(aes(ymin=MEAN_AUPRC-STD_AUPRC, ymax=MEAN_AUPRC+STD_AUPRC), 
                   width=0.4, size = 0.5, position=pd, alpha = 1) +
-    # geom_segment( aes(x=Index, xend=Index, y=0, yend=MEAN_AUPRC, group = N_EST, colour = N_EST)) +
-    # geom_col(position = pd, width = 0.1) + 
     geom_point(aes(shape = N_EST), position = pd, size = 3) +
+    geom_hline(yintercept = baseline_value, linetype = "dashed", color = "black") +
     scale_shape_manual(values=c(3,4,8))+
     theme_pubr() + 
     scale_color_brewer(palette = 'Set1') +
@@ -88,31 +85,21 @@ for (mr in MR) {
     )
     
   plot(p)
+  filename <- paste0("results/", mr , "_MEAN_AUPRC" , ".png")
+  ggsave(filename, plot = p)
 }
 
-  
-  
-
-```
-
-Plot conditions separately but only the global mean
-```{r fig.width=4}
-
-MR = unique(rdf$MR)
-pd = position_dodge(0.6)
-
-for (mr in MR) {
+for (i in seq_along(MR)) {
+  mr <- MR[i]
+  baseline_value <- MEAN_AUROC[i]
   p <- rdf %>%
-    # filter(Index == 'Adaboost') %>%
-    # filter(FI == 'VR') %>%
     filter(MR == mr) %>%
-     filter(!is.na(AUPRC)) %>%
-    ggplot(aes(x=Index, y=AUPRC, group = N_EST, colour = FI)) + 
-    # geom_errorbar(aes(ymin=MEAN_AUPRC-STD_AUPRC, ymax=MEAN_AUPRC+STD_AUPRC), 
-    #               width=0.4, size = 0.5, position=pd, alpha = 1) +
-    # geom_segment( aes(x=Index, xend=Index, y=0, yend=MEAN_AUPRC, group = N_EST, colour = N_EST)) +
-    # geom_col(position = pd, width = 0.1) + 
+     filter(!is.na(MEAN_AUROC)) %>%
+    ggplot(aes(x=Index, y=MEAN_AUROC, group = N_EST, colour = FI)) + 
+    geom_errorbar(aes(ymin=MEAN_AUROC-STD_AUROC, ymax=MEAN_AUROC+STD_AUROC), 
+                  width=0.4, size = 0.5, position=pd, alpha = 1) +
     geom_point(aes(shape = N_EST), position = pd, size = 3) +
+    geom_hline(yintercept = baseline_value, linetype = "dashed", color = "black") + 
     scale_shape_manual(values=c(3,4,8))+
     theme_pubr() + 
     scale_color_brewer(palette = 'Set1') +
@@ -122,16 +109,10 @@ for (mr in MR) {
     )
     
   plot(p)
+  filename <- paste0("results/", mr , "_MEAN_AUROC" , ".png")
+  ggsave(filename, plot = p)
 }
-
-  
-  
-
 ```
-
-
-
-
 
 
 
