@@ -21,6 +21,7 @@ AUPRC <- c(0.10999212039806713, 0.4261383315393321, 0.6587304621389592)
 MEAN_AUPRC <- c(0.19955715263807533, 0.5260921589703365, 0.7257882565622619)
 MEAN_AUROC <- c(0.6725450267402954, 0.8441343415588369, 0.916339278444858)
 
+
 for (i in seq_along(MR)) {
   mr <- MR[i]
   baseline_value <- AUPRC[i]
@@ -29,7 +30,7 @@ for (i in seq_along(MR)) {
      filter(!is.na(AUPRC)) %>%
     ggplot(aes(x=Index, y=AUPRC, group = N_EST, colour = FI)) + 
     geom_point(aes(shape = N_EST), position = pd, size = 3) +
-    geom_hline(yintercept = baseline_value, linetype = "dashed", color = "black") + 
+    geom_hline(yintercept = baseline_value, linetype = "dashed", color = "black", alpha = 0.5) + 
     scale_shape_manual(values=c(3,4,8))+
     theme_pubr() + 
     scale_color_brewer(palette = 'Set1') +
@@ -51,7 +52,7 @@ for (i in seq_along(MR)) {
      filter(!is.na(AUROC)) %>%
     ggplot(aes(x=Index, y=AUROC, group = N_EST, colour = FI)) + 
     geom_point(aes(shape = N_EST), position = pd, size = 3) +
-    geom_hline(yintercept = baseline_value, linetype = "dashed", color = "black") + 
+    geom_hline(yintercept = baseline_value, linetype = "dashed", color = "black", alpha = 0.5) + 
     scale_shape_manual(values=c(3,4,8))+
     theme_pubr() + 
     scale_color_brewer(palette = 'Set1') +
@@ -75,7 +76,7 @@ for (i in seq_along(MR)) {
     geom_errorbar(aes(ymin=MEAN_AUPRC-STD_AUPRC, ymax=MEAN_AUPRC+STD_AUPRC), 
                   width=0.4, size = 0.5, position=pd, alpha = 1) +
     geom_point(aes(shape = N_EST), position = pd, size = 3) +
-    geom_hline(yintercept = baseline_value, linetype = "dashed", color = "black") +
+    geom_hline(yintercept = baseline_value, linetype = "dashed", color = "black", alpha = 0.5) +
     scale_shape_manual(values=c(3,4,8))+
     theme_pubr() + 
     scale_color_brewer(palette = 'Set1') +
@@ -99,7 +100,8 @@ for (i in seq_along(MR)) {
     geom_errorbar(aes(ymin=MEAN_AUROC-STD_AUROC, ymax=MEAN_AUROC+STD_AUROC), 
                   width=0.4, size = 0.5, position=pd, alpha = 1) +
     geom_point(aes(shape = N_EST), position = pd, size = 3) +
-    geom_hline(yintercept = baseline_value, linetype = "dashed", color = "black") + 
+    geom_point(aes(y = AUROC),  size = 2)+
+    geom_hline(yintercept = baseline_value, linetype = "dashed", color = "black", alpha = 0.5) + 
     scale_shape_manual(values=c(3,4,8))+
     theme_pubr() + 
     scale_color_brewer(palette = 'Set1') +
