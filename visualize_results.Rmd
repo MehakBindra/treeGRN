@@ -21,7 +21,30 @@ AUPRC <- c(0.10999212039806713, 0.4261383315393321, 0.6587304621389592)
 MEAN_AUPRC <- c(0.19955715263807533, 0.5260921589703365, 0.7257882565622619)
 MEAN_AUROC <- c(0.6725450267402954, 0.8441343415588369, 0.916339278444858)
 MEAN_AUROC_GENIE <- c(0.661429878034267, 0.8464084933954908, 0.8367971767578932)
+PVALUE <- c(4.551251909495563e-34, 2.8356038810737746e-138, 2.0210215804420206e-203)
 
+for (i in seq_along(MR)) {
+  mr <- MR[i]
+  baseline_value <- PVALUE[i]
+  p <- rdf %>%
+    filter(MR == mr) %>%
+     filter(!is.na(pvalue)) %>%
+    ggplot(aes(x=Index, y=-log(pvalue), group = N_EST, colour = FI)) + 
+    geom_point(aes(shape = N_EST), position = pd, size = 3) +
+    geom_hline(yintercept = baseline_value, linetype = "dashed", color = "black", alpha = 0.5) + 
+    scale_shape_manual(values=c(3,4,8))+
+    theme_pubr() + 
+    scale_color_brewer(palette = 'Set1') +
+    facet_wrap(MR~., ncol = 1, scales = "free_y") +
+    theme(legend.position = "right",
+      axis.text.x = element_text(angle = 45, hjust = 1),
+    )+
+    xlab(NULL) + ylab('-log(PVALUE)')
+    
+  plot(p)
+  filename <- paste0("results/", mr , "PVALUE" , ".png")
+  ggsave(filename, plot = p)
+}
 
 for (i in seq_along(MR)) {
   mr <- MR[i]
